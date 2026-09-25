@@ -40,10 +40,21 @@ function initQuiz(config) {
   scorePill = document.getElementById('scorePill');
   progressFill = document.getElementById('progressFill');
   bestScoreEl = document.getElementById('bestScore');
+
+  // Stable per-question id, assigned once from each question's position
+  // in the ORIGINAL (unshuffled) array as written in the quiz file. This
+  // is what notes are keyed against, so a note survives shuffled re-takes.
+  // Caveat: inserting a question in the middle of an existing quiz file
+  // later will shift the ids of everything after it.
+  CONFIG.questions.forEach((q, i) => {
+    if (!q.id) q.id = `${CONFIG.storageKey}-q${String(i + 1).padStart(2, '0')}`;
+  });
+
   startQuiz();
   const best0 = parseInt(localStorage.getItem(CONFIG.storageKey) || '0');
   if (best0 > 0) bestScoreEl.textContent = `Best score: ${best0} / ${CONFIG.questions.length}`;
   initResources();
+  initNotes();
 }
 
 // ---------------------------------------------------------------------
@@ -121,6 +132,118 @@ function openLightbox(src, alt) {
   lb.classList.add('show');
 }
 
+// ---------------------------------------------------------------------
+// Per-question notes — backed by a Google Sheet via Apps Script (see
+// notes-config.js + notes-backend/NOTES-SETUP.md). Notes are keyed by
+// CONFIG.storageKey + a stable per-question id (assigned in initQuiz),
+// so they survive shuffled re-takes and persist across visits once the
+// backend is configured. With no endpoint configured, the button still
+// renders but saving quietly no-ops.
+// ---------------------------------------------------------------------
+let notesCache = {};
+let notesLoaded = false;
+let notesSaveTimer = null;
+
+function notesConfigured() {
+  return typeof NOTES_CONFIG !== 'undefined' && NOTES_CONFIG.endpoint;
+}
+
+function initNotes() {
+  if (!notesConfigured()) return;
+  fetch(`${NOTES_CONFIG.endpoint}?quiz=${encodeURIComponent(CONFIG.storageKey)}`)
+    .then(r => r.json())
+    .then(data => {
+      if (data && data.ok) {
+        notesCache = data.notes || {};
+        notesLoaded = true;
+        // Patch the note already on screen, if the fetch resolved after
+        // the first question rendered with stale/empty cache.
+        refreshNotesWidget();
+      }
+    })
+    .catch(() => { /* offline or misconfigured — notes button still works locally per-session */ });
+}
+
+function renderNotesWidget(item) {
+  const existing = notesCache[item.id];
+  const hasNote = existing && existing.note;
+  return `
+    <div class="notes-widget" data-note-id="${item.id}">
+      <button class="notes-toggle" id="notesToggle" type="button">
+        <span class="notes-icon">✎</span>
+        <span id="notesToggleLabel">${hasNote ? 'View note' : 'Add a note'}</span>
+        ${hasNote ? '<span class="notes-dot"></span>' : ''}
+      </button>
+      <div class="notes-box" id="notesBox" style="display:${hasNote ? 'block' : 'none'};">
+        <textarea id="notesText" placeholder="Notes for this question… saved automatically">${hasNote ? escapeHtml_(existing.note) : ''}</textarea>
+        <div class="notes-status" id="notesStatus">${!notesConfigured() ? 'Notes server not set up yet — see NOTES-SETUP.md' : ''}</div>
+      </div>
+    </div>
+  `;
+}
+
+function escapeHtml_(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function attachNotesHandlers(item) {
+  const toggle = document.getElementById('notesToggle');
+  const box = document.getElementById('notesBox');
+  const textarea = document.getElementById('notesText');
+  const status = document.getElementById('notesStatus');
+  if (!toggle || !box || !textarea) return;
+
+  toggle.addEventListener('click', () => {
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    if (box.style.display === 'block') textarea.focus();
+  });
+
+  textarea.addEventListener('input', () => {
+    if (!notesConfigured()) {
+      status.textContent = 'Notes server not set up yet — see NOTES-SETUP.md';
+      return;
+    }
+    status.textContent = 'Saving…';
+    clearTimeout(notesSaveTimer);
+    notesSaveTimer = setTimeout(() => saveNote(item, textarea.value, status, toggle), 600);
+  });
+}
+
+function saveNote(item, text, statusEl, toggleEl) {
+  fetch(NOTES_CONFIG.endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // avoids a CORS preflight to Apps Script
+    body: JSON.stringify({ secret: NOTES_CONFIG.secret, quiz: CONFIG.storageKey, question: item.id, note: text })
+  })
+    .then(r => r.json())
+    .then(data => {
+      if (data && data.ok) {
+        notesCache[item.id] = text ? { note: text, updated_at: data.updated_at } : undefined;
+        if (statusEl) statusEl.textContent = text ? 'Saved' : 'Cleared';
+        if (toggleEl) {
+          const label = toggleEl.querySelector('#notesToggleLabel');
+          if (label) label.textContent = text ? 'View note' : 'Add a note';
+        }
+      } else {
+        if (statusEl) statusEl.textContent = (data && data.error) ? `Couldn't save: ${data.error}` : "Couldn't save";
+      }
+    })
+    .catch(() => { if (statusEl) statusEl.textContent = "Couldn't save — check your connection"; });
+}
+
+// Re-renders just the notes widget in place, without disturbing whatever
+// answer state is already on screen (used after the initial notes fetch
+// resolves, in case it lands after the first question already rendered).
+function refreshNotesWidget() {
+  const widget = cardEl.querySelector('.notes-widget');
+  if (!widget) return;
+  const id = widget.dataset.noteId;
+  const item = QUESTIONS.find(q => q.id === id) || CONFIG.questions.find(q => q.id === id);
+  if (!item) return;
+  widget.outerHTML = renderNotesWidget(item);
+  attachNotesHandlers(item);
+}
+
 function startQuiz() {
   QUESTIONS = shuffle(CONFIG.questions);
   current = 0;
@@ -138,6 +261,19 @@ function renderQuestion() {
   else if (item.type === 'match') renderMatch(item);
   else if (item.type === 'multi') renderMulti(item);
   else if (item.type === 'calc') renderCalc(item);
+  else if (item.type === 'fill') renderFill(item);
+}
+
+// Normalizes free-text answers for grading: trims, lowercases, collapses
+// internal whitespace, and drops surrounding punctuation so minor
+// formatting differences (extra space, trailing period) don't fail a
+// correct chemistry name.
+function normalizeText(s) {
+  return String(s || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .replace(/^["'.]+|["'.]+$/g, '');
 }
 
 function givenHtml(item) {
@@ -156,10 +292,12 @@ function renderSingle(item) {
     ${item.tag ? `<div class="q-tag">${item.tag}</div>` : ''}
     <p class="q-text">${item.q}</p>
     ${givenHtml(item)}
+    ${renderNotesWidget(item)}
     <div class="options">${optsHtml}</div>
     <div class="feedback" id="feedback"></div>
     <button class="next-btn" id="nextBtn">${current === QUESTIONS.length - 1 ? 'See results' : 'Next question'}</button>
   `;
+  attachNotesHandlers(item);
 
   cardEl.querySelectorAll('.option').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -204,11 +342,13 @@ function renderMatch(item) {
     <div class="q-tag">Matching \u2014 all must be correct for the point</div>
     <p class="q-text">${item.q}</p>
     ${givenHtml(item)}
+    ${renderNotesWidget(item)}
     <div class="match-rows">${rowsHtml}</div>
     <button class="check-btn" id="checkBtn">Check answers</button>
     <div class="feedback" id="feedback"></div>
     <button class="next-btn" id="nextBtn">${current === QUESTIONS.length - 1 ? 'See results' : 'Next question'}</button>
   `;
+  attachNotesHandlers(item);
 
   document.getElementById('checkBtn').addEventListener('click', () => {
     const selects = cardEl.querySelectorAll('select');
@@ -257,11 +397,13 @@ function renderMulti(item) {
     <div class="q-tag">Select all that apply</div>
     <p class="q-text">${item.q}</p>
     ${givenHtml(item)}
+    ${renderNotesWidget(item)}
     <div class="stmt-list">${stmtHtml}</div>
     <button class="check-btn" id="checkBtn">Check answers</button>
     <div class="feedback" id="feedback"></div>
     <button class="next-btn" id="nextBtn">${current === QUESTIONS.length - 1 ? 'See results' : 'Next question'}</button>
   `;
+  attachNotesHandlers(item);
 
   cardEl.querySelectorAll('.stmt').forEach(el => {
     el.addEventListener('click', () => {
@@ -302,6 +444,7 @@ function renderCalc(item) {
     <div class="q-tag">Calculate the answer</div>
     <p class="q-text">${item.q}</p>
     ${givenHtml(item)}
+    ${renderNotesWidget(item)}
     <div class="calc-row" id="calcRow">
       <input type="text" id="calcInput" placeholder="e.g. 5.24x10^-8" autocomplete="off" spellcheck="false">
       <span class="unit">${item.unit || ''}</span>
@@ -310,6 +453,7 @@ function renderCalc(item) {
     <div class="feedback" id="feedback"></div>
     <button class="next-btn" id="nextBtn">${current === QUESTIONS.length - 1 ? 'See results' : 'Next question'}</button>
   `;
+  attachNotesHandlers(item);
 
   const input = document.getElementById('calcInput');
   input.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('checkBtn').click(); });
@@ -333,6 +477,71 @@ function renderCalc(item) {
       ? `Correct.${item.note ? `<span class="note">${item.note}</span>` : ''}`
       : `The correct answer is <strong>${item.answerDisplay}${item.unit ? ' ' + item.unit : ''}</strong>.${item.note ? `<span class="note">${item.note}</span>` : ''}`;
 
+    document.getElementById('nextBtn').classList.add('show');
+    scorePill.textContent = `${score} / ${QUESTIONS.length}`;
+  });
+
+  document.getElementById('nextBtn').addEventListener('click', nextQuestion);
+}
+
+function renderFill(item) {
+  const rowsHtml = item.blanks.map((b, i) => `
+    <div class="fill-row" data-row="${i}">
+      ${b.label ? `<span class="fill-label">${b.label}</span>` : ''}
+      <input type="text" data-row="${i}" placeholder="type the answer…" autocomplete="off" spellcheck="false">
+      <span class="check-icon"></span>
+    </div>
+  `).join('');
+
+  cardEl.innerHTML = `
+    <div class="q-number">Question ${current + 1} of ${QUESTIONS.length}</div>
+    ${item.tag ? `<div class="q-tag">${item.tag}</div>` : ''}
+    <p class="q-text">${item.q}</p>
+    ${givenHtml(item)}
+    ${renderNotesWidget(item)}
+    <div class="fill-rows">${rowsHtml}</div>
+    <button class="check-btn" id="checkBtn">Check answers</button>
+    <div class="feedback" id="feedback"></div>
+    <button class="next-btn" id="nextBtn">${current === QUESTIONS.length - 1 ? 'See results' : 'Next question'}</button>
+  `;
+  attachNotesHandlers(item);
+
+  const inputs = cardEl.querySelectorAll('.fill-row input');
+  inputs.forEach((inp, idx) => {
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        if (idx < inputs.length - 1) inputs[idx + 1].focus();
+        else document.getElementById('checkBtn').click();
+      }
+    });
+  });
+
+  document.getElementById('checkBtn').addEventListener('click', () => {
+    let allCorrect = true;
+    const wrongList = [];
+
+    inputs.forEach((inp, i) => {
+      const b = item.blanks[i];
+      const accepted = Array.isArray(b.answer) ? b.answer : [b.answer];
+      const given = normalizeText(inp.value);
+      const isCorrect = accepted.some(a => normalizeText(a) === given);
+      inp.disabled = true;
+      const row = cardEl.querySelector(`.fill-row[data-row="${i}"]`);
+      const icon = row.querySelector('.check-icon');
+      if (isCorrect) { row.classList.add('correct'); icon.textContent = '✓'; }
+      else {
+        row.classList.add('incorrect'); icon.textContent = '✗'; allCorrect = false;
+        wrongList.push(`${b.label ? b.label + ': ' : ''}${accepted[0]}`);
+      }
+    });
+
+    if (allCorrect) score++;
+    else missed.push({ q: stripTags(item.q), correct: wrongList.join('; ') });
+
+    document.getElementById('checkBtn').style.display = 'none';
+    const fb = document.getElementById('feedback');
+    fb.classList.add('show', allCorrect ? 'right' : 'wrong');
+    fb.innerHTML = (allCorrect ? 'All correct.' : 'One or more answers were off — correct answers are shown above.') + (item.note ? `<span class="note">${item.note}</span>` : '');
     document.getElementById('nextBtn').classList.add('show');
     scorePill.textContent = `${score} / ${QUESTIONS.length}`;
   });
