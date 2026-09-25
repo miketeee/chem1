@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch. 4 — Nomenclature, Periodic Table &amp; Trends Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/quiz-style.css">
+</head>
+<body>
+<div class="wrap">
+  <a class="back-link" href="../index.html">&larr; All quizzes</a>
+  <header>
+    <div class="title-block">
+      <h1>Ch. 4 — Nomenclature, Periodic Table &amp; Trends</h1>
+      <p>61 questions &middot; HW 09</p>
+    </div>
+    <div class="score-pill" id="scorePill">0 / 61</div>
+  </header>
+
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="card" id="card"></div>
+  <div class="best" id="bestScore"></div>
+  <footer>Recreated from the HW 09 practice quiz (61 questions) &middot; naming ionic/transition-metal/acid/covalent compounds, formula writing, and periodic table trends (size, IE, EA, EN) &middot; the two lettered periodic-chart questions use the exact chart images from the source quiz</footer>
+</div>
+
+<script>const ASSET_BASE = '../assets/';</script>
+<script src="../assets/notes-config.js"></script>
+<script src="../assets/quiz-engine.js"></script>
+<script>
+const CHART_FULL = '<img src="../assets/periodic-chart-full.jpg" alt="Lettered periodic table used for this question" style="width:100%;border-radius:8px;background:#fff;padding:6px;">';
+const CHART_PARTIAL = '<img src="../assets/periodic-chart-partial.jpg" alt="Partial lettered periodic table used for this question" style="width:100%;max-width:420px;border-radius:8px;background:#fff;padding:6px;">';
+const CHART_NOTE = "The letters are randomly chosen and don't match real symbols — assume this chart has the same trends, group names, and family names as the real periodic chart.";
+
+const QUESTIONS_MASTER = [
+  // ---- Naming Ionics ----
+  { type:'single', q:"If two metals form a compound, the compound formed is generally covalent.",
+    opts:['True','False'], correct:1 },
+
+  { type:'single', q:"If two nonmetals form a compound, the compound formed is generally covalent.",
+    opts:['True','False'], correct:0 },
+
+  { type:'single', q:"If a metal and a nonmetal form a compound, the compound formed is generally ionic.",
+    opts:['True','False'], correct:0 },
+
+  { type:'match', q:"Match what you would expect the name of the complex to look like with the types of ions involved.",
+    items:['The name will have a roman numeral and NO prefixes.','The name will have at least one prefix in it.','The name will have NO roman numerals and NO prefixes.'],
+    opts:['alkali or alkaline metal combined with a nonmetal or polyatomic ion','two types of nonmetals','transition metals combined with a nonmetal or polyatomic ion'],
+    correct:[2,1,0] },
+
+  { type:'fill', q:"Name the 4 compounds below. Spelling counts — use the accepted American spelling. Don't capitalize unless needed.",
+    blanks:[
+      {label:'Al₂S₃', answer:'aluminum sulfide'},
+      {label:'NaCl', answer:'sodium chloride'},
+      {label:'CaF₂', answer:'calcium fluoride'},
+      {label:'Mg₃P₂', answer:'magnesium phosphide'}
+    ] },
+
+  { type:'single', q:"What is the correct formula for manganese(III) oxide?",
+    opts:['MnO','Mn₃O','Mn₃O₂','Mn₂O₃','Mn₃O₃'], correct:3,
+    note:"Mn³⁺ + O²⁻ — cross and drop: the 2 from O goes to Mn's subscript, the 3 from Mn goes to O's subscript → Mn₂O₃." },
+
+  { type:'single', q:"If the ions, X⁺ and Y²⁻, form a neutral compound, how many total ions are required?",
+    opts:['3','5','2','4','6'], correct:0,
+    note:"X⁺ and Y²⁻ → X₂Y → 2 + 1 = 3 total ions." },
+
+  { type:'single', q:"If the two ions, X³⁺ and Y⁻, form a neutral compound, how many total ions are required?",
+    opts:['2','6','4','3','5'], correct:2,
+    note:"X³⁺ and Y⁻ → XY₃ → 1 + 3 = 4 total ions." },
+
+  { type:'single', q:"If the two ions, X⁴⁺ and Y²⁻, form a neutral compound, how many total ions are required?",
+    opts:['3','4','6','5','2'], correct:0,
+    note:"Cross and drop gives X₂Y₄ — but that's not the lowest ratio! Simplify to XY₂ → 1 + 2 = 3 total ions." },
+
+  { type:'single', q:"Assume there are some new names and symbols for elements. If the ionic formula shown is By₃X, what would be the name? By = Byzantium (not a transition metal). X = Xuron.",
+    opts:['byzantium xurate','byzantium xurium','byzantide xurium','byzantium xuride'], correct:3,
+    note:"No roman numeral or prefix needed since By isn't a transition metal — the nonmetal X becomes the monatomic anion \"xuride.\"" },
+
+  { type:'single', q:"What is the correct formula for magnesium hydrogen sulfite?",
+    opts:['Mg(HSO₄)₂','MgHSO₃','MgHSO₄','Mg(HSO₃)₂','Mg₂HSO₃'], correct:3,
+    note:"Hydrogen sulfite (HSO₃⁻) is a polyatomic ion with a ‑1 charge. Magnesium is +2, so you need two HSO₃⁻ to balance." },
+
+  { type:'single', q:"What is the correct formula for lithium hydrogen phosphate?",
+    opts:['Li₂HPO₄','Li₂HPO₃','Li₃HPO₃','Li₃HPO₄','LiHPO₃'], correct:0,
+    note:"Hydrogen phosphate is HPO₄²⁻ (‑2 charge), not \"hydrogen\" + \"phosphate\" separately. Lithium is +1, so you need two Li⁺ to balance." },
+
+  { type:'fill', q:"Name the 4 compounds below. Spelling counts — use the accepted American spelling. Don't capitalize unless needed.",
+    blanks:[
+      {label:'Al₂(SO₄)₃', answer:'aluminum sulfate'},
+      {label:'NaClO₂', answer:'sodium chlorite'},
+      {label:'Ca(NO₃)₂', answer:'calcium nitrate'},
+      {label:'Cs₃PO₃', answer:'cesium phosphite'}
+    ] },
+
+  // ---- Naming Transition Metals ----
+  { type:'single', q:"What is the correct name for TiP?",
+    opts:['titanium phosphide','titanium (I) phosphide','titanium (III) phosphide','titanium (III) monophosphide','titanium monophosphide'], correct:2,
+    note:"P³⁻ needs a +3 charge to balance, so it's titanium(III). Ionic names never use prefixes like \"mono-.\"" },
+
+  { type:'fill', q:"Name the 4 compounds below. Use capital 'I' in roman numerals (the letter that ends the word 'hi').",
+    blanks:[
+      {label:'FeO', answer:'iron (II) oxide'},
+      {label:'FeO₂', answer:'iron (IV) oxide'},
+      {label:'Fe₂O₃', answer:'iron (III) oxide'},
+      {label:'FeCl', answer:'iron (I) chloride'}
+    ] },
+
+  { type:'single', q:"What is the correct formula for manganese(III) oxide?",
+    opts:['MnO','Mn₃O','Mn₂O₃','Mn₃O₃','Mn₃O₂'], correct:2 },
+
+  { type:'single', q:"What is the correct formula for ruthenium(II) phosphide?",
+    opts:['Ru₂P₃','Ru₃P₂','Ru₂P','Ru₃P','RuP₂'], correct:1,
+    note:"Ru²⁺ and P³⁻ — cross and drop gives Ru₃P₂ (already lowest terms)." },
+
+  { type:'fill', q:"Name the 4 compounds below. Spelling counts — use the accepted American spelling.",
+    blanks:[
+      {label:'Cr₂(SO₄)₃', answer:'chromium (III) sulfate'},
+      {label:'CrClO₂', answer:'chromium (I) chlorite'},
+      {label:'Co(NO₃)₂', answer:'cobalt (II) nitrate'},
+      {label:'CoPO₃', answer:'cobalt (III) phosphite'}
+    ] },
+
+  // ---- Naming Acids ----
+  { type:'single', q:"What is the correct name for HBrO₂?",
+    given:"Polyatomic ions: BrO₄⁻ = perbromate &nbsp;&middot;&nbsp; BrO₃⁻ = bromate &nbsp;&middot;&nbsp; BrO₂⁻ = bromite &nbsp;&middot;&nbsp; BrO⁻ = hypobromite",
+    opts:['hydrobromic acid','bromous acid','bromic acid','hypobromous acid'], correct:1,
+    note:"BrO₂⁻ is bromite, and ‑ite polyatomic ions form ‑ous acids → bromous acid." },
+
+  { type:'fill', q:"Name the 4 compounds below. Don't include \"(aq)\" in the name.",
+    blanks:[
+      {label:'HCl (aq)', answer:'hydrochloric acid'},
+      {label:'HClO₄ (aq)', answer:'perchloric acid'},
+      {label:'HClO₃ (aq)', answer:'chloric acid'},
+      {label:'HClO₂ (aq)', answer:'chlorous acid'}
+    ] },
+
+  { type:'match', q:"How many H⁺ cations are necessary to form neutral acidic compounds with these polyatomic ions?",
+    items:['ClO⁻','CO₃²⁻','NO₃⁻','PO₃³⁻','C₂O₄²⁻','SO₃²⁻','BrO₃⁻'],
+    opts:['1 H⁺','2 H⁺','3 H⁺'],
+    correct:[0,1,0,2,1,1,0] },
+
+  // ---- Naming Acids and Covalents (covalent naming) ----
+  { type:'single', q:"Which of the following is the best name for SeF₄?",
+    opts:['selenium pentafluoride','selenium tetrafluoride','tetraselenium fluoride','pentaselenium fluoride','selenium fluoride'], correct:1 },
+
+  { type:'single', q:"Which of the following is the best name for P₂O₅?",
+    opts:['phosphorus oxide','phosphorus hexoxide','diphosphorus hexoxide','phosphorus pentoxide','diphosphorus pentoxide'], correct:4,
+    note:"Both elements are nonmetals, so it's a covalent compound named entirely with prefixes — including \"di-\" on phosphorus, since there are 2 of them." },
+
+  { type:'fill', q:"Name the 4 compounds below.",
+    blanks:[
+      {label:'SiBr₄', answer:'silicon tetrabromide'},
+      {label:'N₂O', answer:'dinitrogen monoxide'},
+      {label:'NO₂', answer:'nitrogen dioxide'},
+      {label:'N₃P₂', answer:'trinitrogen diphosphide'}
+    ] },
+
+  { type:'single', q:"Assume there are some new names and symbols for elements. If the ionic formula shown is AE₂, what would be the name? A = Adamantium (nonmetal). E = Exxon.",
+    opts:['diadamantium exxide','adamantium exxide','adamantium diexxide','adamantium exxon'], correct:2,
+    note:"Both A and E are nonmetals (covalent), and there's 1 A (no prefix on the first element when there's only one) and 2 E → \"di-exxide.\"" },
+
+  { type:'single', q:"The correct formula for dinitrogen pentoxide is",
+    opts:['N₂O₆','N₂O₃','N₂O₄','N₂O₅','NO₃'], correct:3 },
+
+  { type:'single', q:"What is the formula for sulfur hexafluoride?",
+    opts:['SF₄','SF₅','SF₆','S₃F','S₆F'], correct:2,
+    note:"Both nonmetals — it's covalent, so you don't have to worry about charges at all, just the prefixes." },
+
+  { type:'fill', q:"These compounds test your ability to distinguish between different naming types — they're similar but each uses a different method. Spelling counts. Chlorine has an 'h' in the spelling!",
+    blanks:[
+      {label:'LiCl', answer:'lithium chloride'},
+      {label:'LiClO₂', answer:'lithium chlorite'},
+      {label:'MnClO₂', answer:'manganese (I) chlorite'},
+      {label:'MnClO₃', answer:'manganese (I) chlorate'},
+      {label:'HClO₃ (don’t include (aq))', answer:'chloric acid'},
+      {label:'HClO₂ (don’t include (aq))', answer:'chlorous acid'},
+      {label:'HCl (don’t include (aq))', answer:'hydrochloric acid'},
+      {label:'ClO₂', answer:'chlorine dioxide'}
+    ] },
+
+  { type:'match', q:"Match to form neutral complexes. All answers will be used once. One answer will be used twice.",
+    items:['three SO₃²⁻','one Cl⁻','one CO₃²⁻','one PO₄³⁻','three IO₄⁻','two O²⁻'],
+    opts:['one Cs⁺','one Mn⁴⁺','two Na⁺','two Al³⁺','three NH₄⁺'],
+    correct:[3,0,2,4,4,1] },
+
+  // ---- Flashbacks (molar mass / moles) ----
+  { type:'calc', q:"FLASHBACK: This is a fake compound. If it were real, what would be the molar mass of Fe₄Mn₄S₄?",
+    tag:'Flashback',
+    given:"Molar masses: Fe = 55.85 g/mol &nbsp;&middot;&nbsp; Mn = 54.94 g/mol &nbsp;&middot;&nbsp; S = 32.06 g/mol &nbsp;&middot;&nbsp; round to two decimal places, don't round early",
+    unit:'g/mol', answerValue:571.40, answerDisplay:'571.40', tolerance:0.005 },
+
+  { type:'calc', q:"FLASHBACK: How many grams of NaBr are in 6.30 × 10²² molecules of sodium bromide (NaBr)?",
+    tag:'Flashback',
+    given:"Molar mass of NaBr = 102.89 g/mol &nbsp;&middot;&nbsp; Avogadro's number = 6.022×10²³ &nbsp;&middot;&nbsp; answer with 3 sig figs",
+    unit:'g', answerValue:10.8, answerDisplay:'10.8', tolerance:0.01 },
+
+  { type:'match', q:"FLASHBACK from module 2: How many electrons do these elements have?",
+    items:['Cl³⁺','Na⁻','Na⁺','Cl²⁻','Na','Cl'],
+    opts:['10','11','12','13','14','15','16','17','18','19','20','21'],
+    correct:[4,2,0,9,1,7],
+    note:"Add electrons for a negative charge, remove them for a positive charge — the charge tells you how far the electron count moved from the neutral atom's proton count." },
+
+  { type:'single', q:"Lab this week will review naming. Use everything you've learned from this homework on the lab. It would be a good idea to review the lab before taking the quiz this week.",
+    opts:['True','False'], correct:0 },
+
+  { type:'single', q:"I understand that if I need additional practice on these topics I can review the nomenclature lab and work the recommended OpenStax exercises.",
+    opts:['True','False'], correct:0 },
+
+  // ---- Periodic Chart and Size Trends ----
+  { type:'match', q:"Determine the true and false statements concerning the periodic chart.",
+    items:['A column is called a group','A row is called a period','Columns have names and Rows have numbers','A row is called a family'],
+    opts:['True','False'],
+    correct:[0,0,0,1],
+    note:"Columns are groups/families (numbered 1–18); rows are periods (numbered 1–7)." },
+
+  { type:'match', q:"The periodic chart attached is what should be used to answer this question. The letters are randomly chosen and do not match symbols on the real periodic chart. Assume that this chart has the same trends, group names, and family names as the real periodic chart and answer questions accordingly.",
+    tag:'Uses the lettered periodic chart',
+    given: CHART_FULL + `<div class="q-given">${CHART_NOTE}</div>`,
+    items:['A metal in period 3.','A nonmetal in period 3.','A halogen with less than 18 protons','An alkaline earth metal'],
+    opts:['J','E','U','T','A','H','Z','L','Q','R','G','D'],
+    correct:[3,4,2,5] },
+
+  { type:'match', q:"Using the same lettered periodic chart, determine which statements are true or false.",
+    tag:'Uses the lettered periodic chart',
+    given: CHART_FULL + `<div class="q-given">${CHART_NOTE}</div>`,
+    items:['E is a noble gas','Q is a halogen','T is an alkali metal','D is an alkaline earth metal'],
+    opts:['True','False'],
+    correct:[0,1,0,1],
+    note:"Q sits in the transition-metal block on this chart, not the halogen column. D is in column 1 (alkali metal), not column 2 (alkaline earth)." },
+
+  { type:'match', q:"Using the same lettered periodic chart, determine which statements are true or false.",
+    tag:'Uses the lettered periodic chart',
+    given: CHART_FULL + `<div class="q-given">${CHART_NOTE}</div>`,
+    items:['D is in the s-block','L is in the d-block','A is in the d-block','A is in the p-block'],
+    opts:['True','False'],
+    correct:[0,0,1,0] },
+
+  { type:'multi', q:"Which of the following elements indicated would be considered inert gases? Mark all that apply.",
+    tag:'Uses the lettered periodic chart',
+    given: CHART_PARTIAL + `<div class="q-given">${CHART_NOTE}</div>`,
+    opts:['Z','X','Y','Q','R','L','P'],
+    correct:[3],
+    note:"Q sits in the rightmost column (group 18) — that's the noble/inert gas family." },
+
+  { type:'single', q:"Ca and Mg are in the same group of the periodic table.",
+    opts:['True','False'], correct:0 },
+
+  { type:'fill', q:"Beryllium and magnesium can be predicted to have similar properties because they are in the same ___ on the periodic table.",
+    blanks:[ {label:'', answer:'group'} ] },
+
+  { type:'single', q:"Calcium is a transition metal as is indicated by its location in the periodic table.",
+    opts:['True','False'], correct:1,
+    note:"Calcium is in column 2 (alkaline earth metals), which sits to the left of the transition metal block." },
+
+  { type:'single', q:"Which of the substances listed is not an element?",
+    opts:['iron','carbon','air','sodium'], correct:2,
+    note:"Air is a mixture of gases (mostly N₂ and O₂), not a single element." },
+
+  { type:'single', q:"Which group contains the alkali metals?",
+    opts:['1A','3A','2A','8A'], correct:0 },
+
+  { type:'multi', q:"Which of the following are halogens? Mark all that apply.",
+    opts:['F','Se','Br','Cl'], correct:[0,2,3] },
+
+  { type:'multi', q:"Which of the following are metals? Mark all that apply.",
+    opts:['Ba','P','Zr','Xe'], correct:[0,2] },
+
+  { type:'single', q:"Which of the following does not belong to the same period as the others?",
+    opts:['C','Ar','N','Li'], correct:1,
+    note:"C, N, and Li are all in period 2. Ar is in period 3." },
+
+  { type:'multi', q:"Which of the indicated elements are metals? Mark all that apply.",
+    tag:'Uses the lettered periodic chart',
+    given: CHART_PARTIAL + `<div class="q-given">${CHART_NOTE}</div>`,
+    opts:['Q','Z','L','R','P','X','Y'],
+    correct:[1,5],
+    note:"X and Z both sit in column 1 (alkali metals) — the rest are on the nonmetal side of the chart." },
+
+  { type:'single', q:"Which of the following lists elements with the most similar chemical properties?",
+    opts:['Si, Ge, Sn','Au, Ag, Hg','Mg, Ca, Sr','Li, Be, B','N, O, F'], correct:2,
+    note:"Mg, Ca, and Sr are all alkaline earth metals — same group, same family." },
+
+  // ---- Periodic Chart and Size Trends (Periodic Trends) ----
+  { type:'single', q:"Based on the periodic trends, the Mg atom is larger than the P atom.",
+    opts:['True','False'], correct:0,
+    note:"Size decreases left to right across a period — Mg is further left than P." },
+
+  { type:'single', q:"The N²⁺ ion is the same size as the B atom.",
+    opts:['True','False'], correct:1 },
+
+  { type:'single', q:"Out of the group of chemical species below, which is the largest? Se, Cl⁻, Br, Se²⁻, and Cl",
+    opts:['Cl⁻','Se²⁻','Br','Cl','Se'], correct:1,
+    note:"Se²⁻ has gained electrons (bigger than neutral Se) and starts from a larger, lower-period atom than Cl." },
+
+  { type:'single', q:"What is the correct order of decreasing size of the following ions?",
+    opts:['Cl⁻ > P³⁻ > Ca²⁺ > K⁺','K⁺ > Cl⁻ > P³⁻ > Ca²⁺','Ca²⁺ > K⁺ > Cl⁻ > P³⁻','P³⁻ > Cl⁻ > K⁺ > Ca²⁺','K⁺ > Cl⁻ > Ca²⁺ > P³⁻'],
+    correct:3,
+    note:"All four are isoelectronic (18 electrons) — with equal electrons, size is set by nuclear charge: fewer protons pulling on the same electron cloud means a bigger ion. P³⁻ (15 protons) > Cl⁻ (17) > K⁺ (19) > Ca²⁺ (20)." },
+
+  { type:'match', q:"Using the lettered periodic chart, answer the following.",
+    tag:'Uses the lettered periodic chart',
+    given: CHART_FULL + `<div class="q-given">${CHART_NOTE}</div>`,
+    items:['The largest metal.','The largest non-metal','The smallest metal.','The smallest non-metal.'],
+    opts:['J','E','U','T','A','H','Z','L','Q','R','G','D'],
+    correct:[11,10,6,1] },
+
+  { type:'single', q:"The ionization energy of an atom is the energy required when you remove an electron from an atom.",
+    opts:['True','False'], correct:0 },
+
+  // ---- Trends for IE, EA, EN ----
+  { type:'match', q:"Using the lettered periodic chart, answer the following.",
+    tag:'Uses the lettered periodic chart',
+    given: CHART_FULL + `<div class="q-given">${CHART_NOTE}</div>`,
+    items:['The element in row 3 with the highest first ionization energy','The element shown on this chart with the highest first ionization energy','The element shown on this chart with the highest electronegativity','The element in row 4 with the highest electron affinity.','The element shown on this chart with the highest electron affinity'],
+    opts:['J','E','U','T','A','H','Z','L','Q','R','G','D'],
+    correct:[4,1,2,6,2] },
+
+  { type:'match', q:"Using the lettered periodic chart, answer the following.",
+    tag:'Uses the lettered periodic chart',
+    given: CHART_FULL + `<div class="q-given">${CHART_NOTE}</div>`,
+    items:['The element on this chart with the lowest electronegativity','The element in the s-block that is diamagnetic','The element on this chart with the lowest electron affinity.','The transition metal that is diamagnetic.','The element on this chart with the lowest first ionization energy'],
+    opts:['J','E','U','T','A','H','Z','L','Q','R','G','D'],
+    correct:[11,5,11,9,11],
+    note:"R sits in the column matching zinc's group — a filled d¹⁰ subshell makes it diamagnetic even though it's a transition metal." },
+
+  { type:'single', q:"Based on the periodic trends, Br has a larger first ionization energy than I.",
+    opts:['True','False'], correct:0,
+    note:"IE increases up a group — Br is above I." },
+
+  { type:'single', q:"Based on the periodic trends, P has a larger first ionization energy than Cl.",
+    opts:['True','False'], correct:1,
+    note:"IE increases across a period — Cl is further right than P." },
+
+  { type:'single', q:"The second ionization energy is the energy required to remove an electron from a +1 ion.",
+    opts:['True','False'], correct:0 },
+
+  { type:'single', q:"I understand that if I need additional practice on these topics I can go to the OpenStax Ch. 3 exercises and work odd questions, checking answers via the linked problem numbers.",
+    opts:['True','False'], correct:0 }
+];
+
+initQuiz({ questions: QUESTIONS_MASTER, storageKey: 'hw09NomenclatureBest' });
+</script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chemistry Quizzes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/quiz-style.css">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="title-block">
+      <h1>Chemistry Quizzes</h1>
+      <p>Practice sets, rebuilt with instant feedback</p>
+    </div>
+  </header>
+
+  <div class="quiz-list" id="quizList"></div>
+
+  <footer style="margin-top:32px;">Scores are saved locally in this browser &mdash; no accounts, no tracking.</footer>
+</div>
+
+<script>const ASSET_BASE = 'assets/';</script>
+<script src="assets/quiz-engine.js"></script>
+<script>
+initResources();
+
+const QUIZZES = [
+  {
+    chapter: 'Ch. 3 \u2014 HW 07',
+    title: 'Waves, Energy & the Bohr Model',
+    desc: 'Wavelength/frequency/energy calculations (\u03bb\u03bd=c, E=h\u03bd), EM spectrum comparisons, Bohr model true/false, hydrogen electron transitions, and quantum number basics.',
+    href: 'quizzes/hw07-waves-bohr-quantum.html',
+    count: 28,
+    storageKey: 'wavesBohrQuizBest'
+  },
+  {
+    chapter: 'Ch. 3 \u2014 HW 08',
+    title: 'Electron Configurations',
+    desc: 'Ground-state and ion configurations, orbital diagrams, noble-gas shorthand, valence electrons, unpaired electrons, and the standard transition-metal exceptions.',
+    href: 'quizzes/hw08-electron-configurations.html',
+    count: 28,
+    storageKey: 'electronQuiz28Best'
+  },
+  {
+    chapter: 'Ch. 4 — HW 09',
+    title: 'Nomenclature, Periodic Table & Trends',
+    desc: 'Naming ionic, transition-metal, acid, and covalent compounds (and reversing it to formulas), plus periodic table families/blocks and size, ionization energy, electron affinity, and electronegativity trends.',
+    href: 'quizzes/hw09-nomenclature-periodic-trends.html',
+    count: 61,
+    storageKey: 'hw09NomenclatureBest'
+  }
+];
+
+const list = document.getElementById('quizList');
+list.innerHTML = QUIZZES.map(q => {
+  const best = parseInt(localStorage.getItem(q.storageKey) || '0');
+  return `
+    <a class="quiz-card" href="${q.href}">
+      <div class="chapter">${q.chapter}</div>
+      <h2>${q.title}</h2>
+      <p>${q.desc}</p>
+      <div class="meta">
+        <span>${q.count} questions</span>
+        ${best > 0 ? `<span class="best-tag">Best: ${best} / ${q.count}</span>` : '<span>Not attempted yet</span>'}
+      </div>
+    </a>
+  `;
+}).join('');
+</script>
+</body>
+</html>

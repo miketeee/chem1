@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch. 3 — Waves, Energy & Bohr Model Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/quiz-style.css">
+</head>
+<body>
+<div class="wrap">
+  <a class="back-link" href="../index.html">&larr; All quizzes</a>
+  <header>
+    <div class="title-block">
+      <h1>Ch. 3 — Waves, Energy &amp; the Bohr Model</h1>
+      <p>28 questions · HW 07</p>
+    </div>
+    <div class="score-pill" id="scorePill">0 / 28</div>
+  </header>
+
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="card" id="card"></div>
+  <div class="best" id="bestScore"></div>
+  <footer>Recreated from the HW 07 practice quiz (28 questions) &middot; &lambda;&nu;=c and E=h&nu; calculation questions accept scientific notation like <code>5.24x10^-8</code></footer>
+</div>
+
+<script>const ASSET_BASE = '../assets/';</script>
+<script src="../assets/notes-config.js"></script>
+<script src="../assets/quiz-engine.js"></script>
+<script>
+const QUESTIONS_MASTER = [
+  { type:'match', q:"Match each comparison to the correct answer (not all terms are used).",
+    items:[
+      "A wave with frequency 1.0\u00d710\u207b\u2079 Hz \u2014 is it high or low frequency vs. a wave at 1.0\u00d710\u2075 Hz?",
+      "Compared to radio waves, are x-rays high or low energy?",
+      "Compared to radio waves, are x-rays high or low frequency?",
+      "Compared to radio waves, are x-rays short or long wavelength?"
+    ],
+    opts:['high','low','short','long'],
+    correct:[1,0,0,2] },
+
+  { type:'multi', q:"Select the correct statements below.",
+    opts:[
+      'Gamma ray energy is higher energy than visible light.',
+      'Gamma ray energy is higher frequency than visible light.',
+      'Gamma ray energy has a longer wavelength than visible light.'
+    ], correct:[0,1],
+    note:"Gamma rays have shorter wavelength than visible light, not longer \u2014 higher energy and frequency always mean shorter wavelength." },
+
+  { type:'calc', q:"Light was measured to have a frequency of 5.73\u00d710\u00b9\u2075 Hz. What is the wavelength of the light (in m)?",
+    given:"\u03bb\u03bd = c &nbsp;&middot;&nbsp; c = 3.00\u00d710\u2078 m/s",
+    unit:'m', answerValue:5.24e-8, answerDisplay:'5.24\u00d710\u207b\u2078' },
+
+  { type:'calc', q:"Light was measured to have a wavelength of 3.9\u00d710\u00b9\u00b9 m. What is the frequency of the light (in Hz)?",
+    given:"\u03bb\u03bd = c &nbsp;&middot;&nbsp; c = 3.00\u00d710\u2078 m/s",
+    unit:'Hz', answerValue:7.7e-4, answerDisplay:'7.7\u00d710\u207b\u2074' },
+
+  { type:'single', q:"What is the wavelength (in nm) of infrared radiation that has a frequency of 9.76\u00d710\u00b9\u00b3 s\u207b\u00b9? (1 m = 10\u2079 nm, c = 3.00\u00d710\u2078 m/s)",
+    opts:['3.25\u00d710\u207b\u2074 nm','2.93\u00d710\u00b9\u00b3 nm','3.07\u00d710\u207b\u2076 nm','3.25\u00d710\u2075 nm','3.07\u00d710\u00b3 nm'],
+    correct:4 },
+
+  { type:'single', q:"If the frequency is observed to be 1.00\u00d710\u00b9\u00b2 Hz for a signal from electromagnetic radiation, what is the wavelength in cm? (c = 3.00\u00d710\u2078 m/s)",
+    opts:['0.0300 cm','3.34 cm','3000 cm','0.000300 cm','3340 cm'],
+    correct:0 },
+
+  { type:'calc', q:"(Bonus) Light was measured to have a wavelength of 9.51\u00d710\u00b2 nm. What is the frequency of the light (in Hz)?",
+    tag:'Bonus question',
+    given:"\u03bb\u03bd = c &nbsp;&middot;&nbsp; c = 3.00\u00d710\u2078 m/s &nbsp;&middot;&nbsp; 1 m = 10\u2079 nm",
+    unit:'Hz', answerValue:3.15e14, answerDisplay:'3.15\u00d710\u00b9\u2074' },
+
+  { type:'single', q:"A radio wave has a frequency of 8.6\u00d710\u2078 Hz. What is the energy of one photon of this radiation? (h = 6.626\u00d710\u207b\u00b3\u2074 J\u00b7s)",
+    opts:['2.3\u00d710\u207b\u00b3\u2074 J','7.7\u00d710\u207b\u00b9\u2075 J','5.7\u00d710\u207b\u00b2\u2075 J','7.7\u00d710\u207b\u2074\u00b3 J','1.7\u00d710\u207b\u00b9\u2076 J'],
+    correct:2 },
+
+  { type:'calc', q:"The frequency of a radio wave was measured to be 2.5\u00d710\u2078 Hz. What is the energy of the radio wave in kilojoules (kJ)?",
+    given:"E = h\u03bd &nbsp;&middot;&nbsp; h = 6.626\u00d710\u207b\u00b3\u2074 J\u00b7s &nbsp;&middot;&nbsp; watch the unit \u2014 answer in kJ, not J",
+    unit:'kJ', answerValue:1.7e-28, answerDisplay:'1.7\u00d710\u207b\u00b2\u2078' },
+
+  { type:'calc', q:"The frequency of a radio wave was measured to be 7.7\u00d710\u2078 Hz. What is the energy of the radio wave in kilojoules (kJ)?",
+    given:"E = h\u03bd &nbsp;&middot;&nbsp; h = 6.626\u00d710\u207b\u00b3\u2074 J\u00b7s &nbsp;&middot;&nbsp; watch the unit \u2014 answer in kJ, not J",
+    unit:'kJ', answerValue:5.1e-28, answerDisplay:'5.1\u00d710\u207b\u00b2\u2078' },
+
+  { type:'single', q:"A photon has an energy of 4.21\u00d710\u207b\u00b9\u2075 J. What is its frequency? (h = 6.626\u00d710\u207b\u00b3\u2074 J\u00b7s)",
+    opts:['2.79\u00d710\u207b\u2074\u2078 s\u207b\u00b9','1.57\u00d710\u207b\u00b9\u2079 s\u207b\u00b9','2.79\u00d710\u2074\u2078 s\u207b\u00b9','6.35\u00d710\u207b\u00b9\u2078 s\u207b\u00b9','6.35\u00d710\u00b9\u2078 s\u207b\u00b9'],
+    correct:4 },
+
+  { type:'calc', q:"The energy of a wave is 3.95\u00d710\u207b\u00b2\u2075 J. What is the frequency, measured in Hz?",
+    given:"E = h\u03bd &nbsp;&middot;&nbsp; h = 6.626\u00d710\u207b\u00b3\u2074 J\u00b7s",
+    unit:'Hz', answerValue:5.96e8, answerDisplay:'5.96\u00d710\u2078' },
+
+  { type:'calc', q:"Light was measured to have a wavelength of 7.51\u00d710\u207b\u2079 m. What is the energy (in J) of that light wave?",
+    given:"E = hc/\u03bb &nbsp;&middot;&nbsp; c = 3.00\u00d710\u2078 m/s &nbsp;&middot;&nbsp; h = 6.626\u00d710\u207b\u00b3\u2074 J\u00b7s",
+    unit:'J', answerValue:2.65e-17, answerDisplay:'2.65\u00d710\u207b\u00b9\u2077' },
+
+  { type:'calc', q:"What is the constant c (speed of light) used throughout the \u03bb\u03bd = c and E = hc/\u03bb equations, in m/s?",
+    unit:'m/s', answerValue:3.00e8, answerDisplay:'3.00\u00d710\u2078', tolerance:0.005 },
+
+  { type:'single', q:"The Bohr model of the atom describes the locations of the electrons as being in orbit-like paths around the nucleus.",
+    opts:['True','False'], correct:0 },
+
+  { type:'single', q:"Atomic orbitals developed using quantum mechanics describe probabilities of finding the electron, as opposed to exact paths for electrons.",
+    opts:['True','False'], correct:0 },
+
+  { type:'single', q:"If a sample of atoms is heated, it will emit a discrete, or line, spectrum.",
+    opts:['True','False'], correct:0 },
+
+  { type:'single', q:"A rainbow is an example of a continuous spectrum.",
+    opts:['True','False'], correct:0 },
+
+  { type:'single', q:"Which transition of a single electron in a 1-electron system would have the lowest energy?",
+    opts:['4 \u2192 1','5 \u2192 2','6 \u2192 3'], correct:2,
+    note:"Energy levels get closer together as n increases, so the smallest gap \u2014 and lowest energy \u2014 is 6\u21923." },
+
+  { type:'single', q:"Which transition of a single electron in a 1-electron system would have the lowest energy?",
+    opts:['4 \u2192 1','4 \u2192 2','4 \u2192 3'], correct:2,
+    note:"Adjacent levels have the smallest energy gap." },
+
+  { type:'single', q:"Which of the following electronic transitions of hydrogen has the highest (largest) frequency and thus releases the largest amount of energy?",
+    opts:['5 \u2192 1','4 \u2192 1','5 \u2192 4'], correct:0,
+    note:"The largest jump between energy levels releases the most energy." },
+
+  { type:'single', q:"Which of the following electronic transitions of hydrogen has the longest wavelength?",
+    opts:['4 \u2192 3','3 \u2192 2','1 \u2192 4'], correct:0,
+    note:"Longest wavelength = lowest energy = smallest gap between levels (1\u21924 is an absorption with a large gap)." },
+
+  { type:'single', q:"Which of the following electronic transitions of hydrogen releases the longest wavelength emission?",
+    opts:['5 \u2192 4','4 \u2192 3','3 \u2192 2'], correct:0,
+    note:"Among these emissions, 5\u21924 has the smallest energy gap and therefore the longest wavelength." },
+
+  { type:'single', q:"Additional practice for these topics is available at the OpenStax Chemistry (Atoms First 2e) textbook, section 3 exercises (odd problems 3\u201312 and 17\u201327), with answer keys linked from each problem number.",
+    opts:['True','False'], correct:0 },
+
+  { type:'multi', q:"Which of the following are true? Select all that apply.",
+    opts:[
+      'The maximum number of electrons in a 3p orbital is 2.',
+      '1f, 2f, and 3f subshells do not exist and thus cannot contain any electrons.',
+      'The maximum number of electrons that can have the principal quantum number n = 3 if you combine the s, p, and d orbitals is 18.'
+    ], correct:[0,1,2] },
+
+  { type:'single', q:"Which one of the following would NOT be possible as part of an electron configuration?",
+    opts:['5d\u2077 with 3 unpaired electrons','5p\u00b3 with 3 unpaired electrons','5d\u00b2 with 2 unpaired electrons','5s\u00b2 with 1 unpaired electron','5s\u00b9 with 1 unpaired electron'],
+    correct:3, note:"A filled s\u00b2 subshell has both electrons paired \u2014 0 unpaired, never 1." },
+
+  { type:'match', q:"Match the numbers with the descriptions. Numbers may be used more than once; not all will be used.",
+    items:[
+      'The number of orbitals in a 5d subshell',
+      'The number of electrons in a filled 6p subshell',
+      'The number of orbitals in a 4p subshell',
+      'The number of electrons in a 3d orbital (one single orbital, not the whole subshell)',
+      'The number of electrons in a 1f subshell',
+      'The number of electrons in a filled 2s subshell',
+      'The number of orbitals in a 3s subshell'
+    ],
+    opts:['1','2','3','4','5','6','7','8','9','10','11','12','13','14','0 = Not a possible combination'],
+    correct:[4,5,2,1,14,1,0] },
+
+  { type:'single', q:"The maximum number of electrons allowed in the fourth energy level (n = 4) is",
+    opts:['two','sixteen','eight','thirty-two','eighteen'], correct:3, note:"Max electrons per level = 2n\u00b2 = 2(4)\u00b2 = 32" }
+];
+
+initQuiz({ questions: QUESTIONS_MASTER, storageKey: 'wavesBohrQuizBest' });
+</script>
+</body>
+</html>
